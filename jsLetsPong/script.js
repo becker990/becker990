@@ -46,7 +46,9 @@ class Airtrack {
 		var vely = getRandomInt(-10, 10);
 		
 		var newobj = new Square(posx, posy, velx, vely, size, size);				
-		this.objects.push(newobj);		
+		this.objects.push(newobj);
+		
+		return newobj;
 	}
 		
 	square_collision (obj = null, delta = 0) {
@@ -64,6 +66,8 @@ class Airtrack {
 		if (obj.y < 0 || (obj.y + obj.hei) > this.hei) {									
 			obj.vel_y = obj.vel_y * -1;			
 		}
+	
+		return obj;
 	
 	}
 	
@@ -116,10 +120,8 @@ class GameManager {
 	
 	add_obj (num = 1) {	
 		for (var i = 0; i < num; i++) {
-			this.at.ins_rand_obj();
-		}
-		
-		this.start_run();				
+			this.at.ins_rand_obj();			
+		}						
 	}
 	
 	update (delta = 0) {
@@ -132,8 +134,9 @@ class GameManager {
 				
 		for (var obj of this.at.objects) {
 			
-			this.system.ctx.rect(obj.x, obj.y, obj.wid, obj.hei);
-						
+			//ctx.fillRect(x, y, width, height);
+			this.system.ctx.fillRect(obj.x, obj.y, obj.wid, obj.hei);
+			
 			/*
 			this.system.ctx.beginPath();
 			this.system.ctx.arc(b.x, b.y, (b.wid / 2), 0, 2 * Math.PI, false);
@@ -157,6 +160,10 @@ $(function() {
     
     var game = new GameManager();
 	
+	game.add_obj(10);
+	
+	game.start_run();
+	
 	$("#runbtn").click(function(){
 	
 		game.toggle_run();
@@ -177,10 +184,6 @@ $(function() {
 		game.add_obj(ballnum);
 
 	});
-	
-	game.add_obj(10);
-	
-	game.start_run();
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
