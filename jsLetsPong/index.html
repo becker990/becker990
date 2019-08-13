@@ -17,40 +17,52 @@
 		
 		
 		<div class="container">
-			<div class="row align-items-center">
+			<div class="row">
 				<div class="col">
 
 					<h1>Hello, world!</h1>
 
 					<hr>
-					<canvas class="maincanvas" id="maincanvas">
-					
-						no canvas					
-
-					</canvas>
+					<div class="d-flex justify-content-center">
+						
+						<canvas class="maincanvas" id="maincanvas">						
+							no canvas
+						</canvas>
+					</div>
 					
 				</div>
 			</div>
 			   <div class="row">
 					<div class="col">					
-						
-						<form>
-						  <div class="form-group">
-							<label for="exampleFormControlInput1">Number of balls:</label>
-							<input type="number" class="form-control" id="ballnum" placeholder="10">
-							
-						  </div>
-						  <div class="form-group">							
-							<button type="button" class="btn btn-primary" id="addbtn">Add balls</button>
-							<button type="button" class="btn btn-primary" id="runbtn">Run</button>							
-						  </div>						  
-						  
-						</form>
+						<h3>lorem ispum</h3>
+						<p>
+						Lorem ipsum Lorem ipsumLorem ipsumLorem ipsumLorem 
+						ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem
+						ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem
+						ipsumLorem ipsumLorem ipsum...
+						</p>
 					</div>
 					<div class="col">
 					
-						<p>						Lorem ipsum Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum...
-						</p>
+					<h3>Controls</h3>						
+						<form>
+						  <div class="form-group row">
+							<label for="exampleFormControlInput1" class="col-sm-6 col-form-label">Number of balls to add or remove:</label>
+
+							<div class="col-sm-6">
+								<input type="number" class="form-control" id="ballnum" placeholder="">
+							</div>							
+						  </div>
+						  <div class="form-group row text-right">
+						  	<div class="col-sm">							
+								<button type="button" class="btn btn-success" id="addbtn">Add balls</button>
+								<button type="button" class="btn btn-danger" id="removebtn">Remove balls</button>
+								<button type="button" class="btn btn-primary" id="runbtn">Run</button>							
+						  	</div>
+						  </div>						  
+						  
+						</form>
+						
 						
 					</div>					
 				  </div>
