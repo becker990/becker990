@@ -30,11 +30,14 @@ class Square {
 
 class Airtrack {	
 	
-	constructor (wid = 0, hei = 0) {
-		this.wid = wid;
-		this.hei = hei;
-		
+	constructor () {
+		this.wid = 0;
+		this.hei = 0;		
 		this.objects = [];
+	}
+	
+	get_obj_count() {		
+		return this.objects.length;		
 	}
 		
 	ins_rand_obj() {	
@@ -50,12 +53,24 @@ class Airtrack {
 		
 		return newobj;
 	}
+	
+	remove_rand_obj() {
+		if (this.get_obj_count() > 0)
+			this.objects.pop();
+	}
+
+	set_size(wid = 0, hei = 0) {
+		this.wid = wid;
+		this.hei = hei;		
+	}
 		
 	square_collision (obj = null, delta = 0) {
 	
 		if (!obj instanceof Square) {			
 			throw "Wrong class";
 		}
+		
+		dbg(this.hei);
 		
 		obj.x = obj.x + (obj.vel_x * delta);
 		obj.y = obj.y + (obj.vel_y * delta);
@@ -66,7 +81,18 @@ class Airtrack {
 		if (obj.y < 0 || (obj.y + obj.hei) > this.hei) {									
 			obj.vel_y = obj.vel_y * -1;			
 		}
-	
+		
+		// sticky fix
+		if (obj.x < 0)
+			obj.x = 0;
+		if ((obj.x + obj.wid) > this.wid)
+			obj.x = this.wid - obj.wid;
+		
+		if (obj.y < 0)
+			obj.y = 0;
+		if ((obj.y + obj.hei) > this.hei)
+			obj.y = this.hei - obj.hei;
+			
 		return obj;
 	
 	}
@@ -84,23 +110,31 @@ class SystemManager {
 	constructor (canvasid = "") {
 		this.CANVASID = canvasid;
 
-		this.cnv = document.getElementById(canvasid);
-				
-		this.cnv.width  = this.cnv.scrollWidth;
-		this.cnv.height = this.cnv.scrollHeight;
-
-		this.ctx = this.cnv.getContext('2d');		
+		this.cnv = document.getElementById(canvasid);		
+	}
+	
+	update() {
+		
+		var portwid = this.cnv.clientWidth;
+		var porthei = this.cnv.clientHeight;		
+		
+		$('#' + this.CANVASID).css({'height' : (portwid / 2) + 'px'});
+		
+		this.cnv.width  = portwid;
+		this.cnv.height = porthei;
+			
+		this.ctx = this.cnv.getContext('2d');
 	}
 }
 
 class GameManager {
 
-	constructor () {
-		this.system = new SystemManager("maincanvas");
+	constructor (canvasid = "") {
+		this.system = new SystemManager(canvasid);
 		
 		this.RUNS = false;
 		
-		this.at = new Airtrack(this.system.cnv.width, this.system.cnv.height);
+		this.at = new Airtrack();
 	}
 	
 	start_run () {
@@ -124,7 +158,18 @@ class GameManager {
 		}						
 	}
 	
+	remove_obj (num = 1) {	
+		for (var i = 0; i < num; i++) {
+			this.at.remove_rand_obj();			
+		}						
+	}
+	
 	update (delta = 0) {
+		var wid = this.system.cnv.width;
+		var hei = this.system.cnv.height;
+		
+		this.at.set_size(wid, hei);
+		
 		this.at.update(delta);
 	}
 		
@@ -146,10 +191,11 @@ class GameManager {
 		}			
 	}
 	
-	frame (delta = 0) {
-		if (!this.RUNS)
-			return 0;
-		this.update(delta);
+	gameframe (delta = 0) {
+		this.system.update();
+		if (this.RUNS) {
+			this.update(delta);			
+		}		
 		this.draw();		
 	}
 }
@@ -157,10 +203,10 @@ class GameManager {
 $(function() {    
     
     console.log("jquery ready!");
-    
-    var game = new GameManager();
 	
-	game.add_obj(10);
+	canvasid = "maincanvas";
+	    
+    var game = new GameManager(canvasid);
 	
 	game.start_run();
 	
@@ -174,8 +220,6 @@ $(function() {
 
 		var ballnum = $('#ballnum').val();
 
-		dbg(ballnum);
-		
 		if (ballnum < 1) {
 			alert("Not enough!");
 			return 0;
@@ -184,10 +228,23 @@ $(function() {
 		game.add_obj(ballnum);
 
 	});
+	
+	$("#removebtn").click(function() { 
+	
+		var ballnum = $('#ballnum').val();	
+		
+		if (ballnum < 1) {
+			alert("Not enough!");
+			return 0;
+		}
+	
+		game.remove_obj(ballnum);
+	
+	});
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
-		game.frame(1);
+		game.gameframe(1);
 	}	  
 
 	main(); // Start the cycle
