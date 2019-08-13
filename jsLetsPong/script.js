@@ -70,8 +70,6 @@ class Airtrack {
 			throw "Wrong class";
 		}
 		
-		dbg(this.hei);
-		
 		obj.x = obj.x + (obj.vel_x * delta);
 		obj.y = obj.y + (obj.vel_y * delta);
 		
@@ -172,7 +170,7 @@ class GameManager {
 		
 		this.at.update(delta);
 	}
-		
+			
 	draw () {	
 		// clear canvas
 		this.system.ctx.clearRect(0, 0, this.system.cnv.width, this.system.cnv.height);
@@ -200,6 +198,8 @@ class GameManager {
 	}
 }
 
+
+
 $(function() {    
     
     console.log("jquery ready!");
@@ -210,12 +210,23 @@ $(function() {
 	
 	game.start_run();
 	
-	$("#runbtn").click(function(){
+	for (var i = 0; i < 10; i++) {		
+		game.gameframe(1);
+	}
 	
+	game.add_obj(10);
+		
+	$("#runbtn").click(function() {		
 		game.toggle_run();
-	
+		$(this).toggleClass("btn-primary");
+		$(this).toggleClass("btn-secondary");
+		
+		if (game.RUNS)
+			$(this).html("Pause");
+		else
+			$(this).html("Run");
 	});
-
+	
 	$("#addbtn").click(function() {
 
 		var ballnum = $('#ballnum').val();
