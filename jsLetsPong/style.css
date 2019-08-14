@@ -1,10 +1,8 @@
 #runbtn {
-	min-width: 150px;
-	
+	min-width: 100px;	
 }
 
 .maincanvas {		
-	width:61%;			
-	border: 1px solid black;
-	
+	width:100%;			
+	border: 1px solid black;	
 }

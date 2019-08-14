@@ -17,11 +17,14 @@ function dbg(msg = "") {
 
 class Square {
 	constructor (x = 0, y = 0, vel_x = 0, vel_y = 0, wid = 0, hei = 0) {
-		this.x = x; // physics
-		this.y = y;	
 		
-		this.vel_x = vel_x;
+		this.mass = 1;
+	
+    this.vel_x = vel_x;
 		this.vel_y = vel_y;
+	
+    this.x = x;
+		this.y = y;			
 		
 		this.wid = wid; //px
 		this.hei = hei;
@@ -34,10 +37,20 @@ class Airtrack {
 		this.wid = 0;
 		this.hei = 0;		
 		this.objects = [];
+		this.gravity = 0;
+	}
+	
+	set_gravity(g = 0) {
+		this.gravity = g;		
 	}
 	
 	get_obj_count() {		
 		return this.objects.length;		
+	}
+	
+	ins_obj(obj = null) {		
+		this.objects.push(obj);		
+
 	}
 		
 	ins_rand_obj() {	
@@ -45,8 +58,9 @@ class Airtrack {
 	
 		var posx = getRandomInt(0, (this.wid - size));
 		var posy = getRandomInt(0, (this.hei - size));		
-		var velx = getRandomInt(-10, 10);
-		var vely = getRandomInt(-10, 10);
+		var velx = getRandomInt(-100, 100);
+		var vely = getRandomInt(-100, 100);
+
 		
 		var newobj = new Square(posx, posy, velx, vely, size, size);				
 		this.objects.push(newobj);
@@ -69,17 +83,35 @@ class Airtrack {
 		if (!obj instanceof Square) {			
 			throw "Wrong class";
 		}
+
+		var g = this.gravity;
+				
+		var dv_y = g * delta;		
+		obj.vel_y = obj.vel_y + dv_y;		
 		
 		obj.x = obj.x + (obj.vel_x * delta);
 		obj.y = obj.y + (obj.vel_y * delta);
+			
+		var meuDR = 0.9;
 		
 		if (obj.x < 0 || (obj.x + obj.wid) > this.wid) {				
-			obj.vel_x = obj.vel_x * -1;			
+			obj.vel_x = obj.vel_x * meuDR * -1.0;			
 		}
 		if (obj.y < 0 || (obj.y + obj.hei) > this.hei) {									
-			obj.vel_y = obj.vel_y * -1;			
+			obj.vel_y = obj.vel_y * meuDR * -1.0;			
 		}
+
+		var micra = 0.000001;
+		/*	
+		if (obj.vel_x <= 0)
+			obj.vel_x = 0;
 		
+		if (obj.vel_y <= 0)
+			obj.vel_y = 0;		
+		*/
+		obj.vel_x = obj.vel_x - (micra * delta);
+		obj.vel_y = obj.vel_y - (micra * delta);
+			
 		// sticky fix
 		if (obj.x < 0)
 			obj.x = 0;
@@ -90,9 +122,7 @@ class Airtrack {
 			obj.y = 0;
 		if ((obj.y + obj.hei) > this.hei)
 			obj.y = this.hei - obj.hei;
-			
-		return obj;
-	
+		
 	}
 	
 	update (delta = 0) {		
@@ -130,9 +160,11 @@ class GameManager {
 	constructor (canvasid = "") {
 		this.system = new SystemManager(canvasid);
 		
-		this.RUNS = false;
+		this.RUNS = true;
 		
 		this.at = new Airtrack();
+		
+		this.gameframe(1);
 	}
 	
 	start_run () {
@@ -150,13 +182,13 @@ class GameManager {
 			this.start_run();			
 	}
 	
-	add_obj (num = 1) {	
+	add_rand_obj (num = 1) {	
 		for (var i = 0; i < num; i++) {
 			this.at.ins_rand_obj();			
 		}						
 	}
 	
-	remove_obj (num = 1) {	
+	remove_rand_obj (num = 1) {	
 		for (var i = 0; i < num; i++) {
 			this.at.remove_rand_obj();			
 		}						
@@ -170,7 +202,7 @@ class GameManager {
 		
 		this.at.update(delta);
 	}
-			
+		
 	draw () {	
 		// clear canvas
 		this.system.ctx.clearRect(0, 0, this.system.cnv.width, this.system.cnv.height);
@@ -198,46 +230,42 @@ class GameManager {
 	}
 }
 
-
-
 $(function() {    
     
-    console.log("jquery ready!");
+  console.log("jquery ready!");
 	
 	canvasid = "maincanvas";
 	    
-    var game = new GameManager(canvasid);
+  var game = new GameManager(canvasid);
 	
 	game.start_run();
-	
-	for (var i = 0; i < 10; i++) {		
-		game.gameframe(1);
-	}
-	
-	game.add_obj(10);
 		
+	var size = 20;
+	
+	game.add_rand_obj(10);
+	
 	$("#runbtn").click(function() {		
-		game.toggle_run();
+			
 		$(this).toggleClass("btn-primary");
 		$(this).toggleClass("btn-secondary");
-		
+		game.toggle_run();
+
 		if (game.RUNS)
 			$(this).html("Pause");
 		else
-			$(this).html("Run");
+			$(this).html("Run");		
 	});
-	
+
+
 	$("#addbtn").click(function() {
 
-		var ballnum = $('#ballnum').val();
+      var ballnum = $('#ballnum').val();
 
-		if (ballnum < 1) {
-			alert("Not enough!");
-			return 0;
-		}
-		
-		game.add_obj(ballnum);
-
+      if (ballnum < 1) {
+        alert("Not enough!");
+        return 0;
+      }		
+  		game.add_rand_obj(ballnum);
 	});
 	
 	$("#removebtn").click(function() { 
@@ -248,14 +276,19 @@ $(function() {
 			alert("Not enough!");
 			return 0;
 		}
-	
-		game.remove_obj(ballnum);
-	
+		game.remove_rand_obj(ballnum);	
 	});
+	
+	$("#gravitycontrol").change(function() {
+		var val = $(this).val();
+		dbg(val);
+        game.at.set_gravity(val);
+		$("#gravdisp").html(val);
+   });
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
-		game.gameframe(1);
+		game.gameframe(0.05);
 	}	  
 
 	main(); // Start the cycle
