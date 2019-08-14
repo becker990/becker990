@@ -17,11 +17,14 @@ function dbg(msg = "") {
 
 class Square {
 	constructor (x = 0, y = 0, vel_x = 0, vel_y = 0, wid = 0, hei = 0) {
-		this.x = x; // physics
-		this.y = y;	
+		
+		this.mass = 1;
 		
 		this.vel_x = vel_x;
 		this.vel_y = vel_y;
+		
+		this.x = x;
+		this.y = y;			
 		
 		this.wid = wid; //px
 		this.hei = hei;
@@ -34,10 +37,15 @@ class Airtrack {
 		this.wid = 0;
 		this.hei = 0;		
 		this.objects = [];
+		this.gravity = 100;
 	}
 	
 	get_obj_count() {		
 		return this.objects.length;		
+	}
+	
+	ins_obj(obj = null) {		
+		this.objects.push(obj);		
 	}
 		
 	ins_rand_obj() {	
@@ -45,8 +53,8 @@ class Airtrack {
 	
 		var posx = getRandomInt(0, (this.wid - size));
 		var posy = getRandomInt(0, (this.hei - size));		
-		var velx = getRandomInt(-10, 10);
-		var vely = getRandomInt(-10, 10);
+		var velx = getRandomInt(-100, 100);
+		var vely = getRandomInt(-100, 100);
 		
 		var newobj = new Square(posx, posy, velx, vely, size, size);				
 		this.objects.push(newobj);
@@ -69,19 +77,35 @@ class Airtrack {
 		if (!obj instanceof Square) {			
 			throw "Wrong class";
 		}
-		
-		dbg(this.hei);
+
+		var g = this.gravity;
+				
+		var dv_y = g * delta;		
+		obj.vel_y = obj.vel_y + dv_y;		
 		
 		obj.x = obj.x + (obj.vel_x * delta);
 		obj.y = obj.y + (obj.vel_y * delta);
+			
+		var meuDR = 0.9;
 		
 		if (obj.x < 0 || (obj.x + obj.wid) > this.wid) {				
-			obj.vel_x = obj.vel_x * -1;			
+			obj.vel_x = obj.vel_x * meuDR * -1.0;			
 		}
 		if (obj.y < 0 || (obj.y + obj.hei) > this.hei) {									
-			obj.vel_y = obj.vel_y * -1;			
+			obj.vel_y = obj.vel_y * meuDR * -1.0;			
 		}
+
+		var micra = 0.000001;
+		/*	
+		if (obj.vel_x <= 0)
+			obj.vel_x = 0;
 		
+		if (obj.vel_y <= 0)
+			obj.vel_y = 0;		
+		*/
+		obj.vel_x = obj.vel_x - (micra * delta);
+		obj.vel_y = obj.vel_y - (micra * delta);
+			
 		// sticky fix
 		if (obj.x < 0)
 			obj.x = 0;
@@ -92,9 +116,7 @@ class Airtrack {
 			obj.y = 0;
 		if ((obj.y + obj.hei) > this.hei)
 			obj.y = this.hei - obj.hei;
-			
-		return obj;
-	
+		
 	}
 	
 	update (delta = 0) {		
@@ -132,9 +154,11 @@ class GameManager {
 	constructor (canvasid = "") {
 		this.system = new SystemManager(canvasid);
 		
-		this.RUNS = false;
+		this.RUNS = true;
 		
 		this.at = new Airtrack();
+		
+		this.gameframe(1);
 	}
 	
 	start_run () {
@@ -152,13 +176,13 @@ class GameManager {
 			this.start_run();			
 	}
 	
-	add_obj (num = 1) {	
+	add_rand_obj (num = 1) {	
 		for (var i = 0; i < num; i++) {
 			this.at.ins_rand_obj();			
 		}						
 	}
 	
-	remove_obj (num = 1) {	
+	remove_rand_obj (num = 1) {	
 		for (var i = 0; i < num; i++) {
 			this.at.remove_rand_obj();			
 		}						
@@ -209,9 +233,13 @@ $(function() {
     var game = new GameManager(canvasid);
 	
 	game.start_run();
+		
+	var size = 20;
 	
-	$("#runbtn").click(function(){
+	game.add_rand_obj(10);
 	
+	$("#runbtn").click(function() {		
+
 		game.toggle_run();
 	
 	});
@@ -225,7 +253,7 @@ $(function() {
 			return 0;
 		}
 		
-		game.add_obj(ballnum);
+		game.add_rand_obj(ballnum);
 
 	});
 	
@@ -238,13 +266,13 @@ $(function() {
 			return 0;
 		}
 	
-		game.remove_obj(ballnum);
+		game.remove_rand_obj(ballnum);
 	
 	});
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
-		game.gameframe(1);
+		game.gameframe(0.05);
 	}	  
 
 	main(); // Start the cycle
