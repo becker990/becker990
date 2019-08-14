@@ -37,7 +37,11 @@ class Airtrack {
 		this.wid = 0;
 		this.hei = 0;		
 		this.objects = [];
-		this.gravity = 100;
+		this.gravity = 0;
+	}
+	
+	set_gravity(g = 0) {
+		this.gravity = g;		
 	}
 	
 	get_obj_count() {		
@@ -239,9 +243,15 @@ $(function() {
 	game.add_rand_obj(10);
 	
 	$("#runbtn").click(function() {		
-
+			
+		$(this).toggleClass("btn-primary");
+		$(this).toggleClass("btn-secondary");
 		game.toggle_run();
-	
+
+		if (game.RUNS)
+			$(this).html("Pause");
+		else
+			$(this).html("Run");		
 	});
 
 	$("#addbtn").click(function() {
@@ -269,6 +279,13 @@ $(function() {
 		game.remove_rand_obj(ballnum);
 	
 	});
+	
+	$("#gravitycontrol").change(function() {
+		var val = $(this).val();
+		dbg(val);
+        game.at.set_gravity(val);
+		$("#gravdisp").html(val);
+    });
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
