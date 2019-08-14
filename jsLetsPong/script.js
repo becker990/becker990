@@ -19,11 +19,11 @@ class Square {
 	constructor (x = 0, y = 0, vel_x = 0, vel_y = 0, wid = 0, hei = 0) {
 		
 		this.mass = 1;
-		
-		this.vel_x = vel_x;
+	
+    this.vel_x = vel_x;
 		this.vel_y = vel_y;
-		
-		this.x = x;
+	
+    this.x = x;
 		this.y = y;			
 		
 		this.wid = wid; //px
@@ -50,6 +50,7 @@ class Airtrack {
 	
 	ins_obj(obj = null) {		
 		this.objects.push(obj);		
+
 	}
 		
 	ins_rand_obj() {	
@@ -59,6 +60,7 @@ class Airtrack {
 		var posy = getRandomInt(0, (this.hei - size));		
 		var velx = getRandomInt(-100, 100);
 		var vely = getRandomInt(-100, 100);
+
 		
 		var newobj = new Square(posx, posy, velx, vely, size, size);				
 		this.objects.push(newobj);
@@ -230,11 +232,11 @@ class GameManager {
 
 $(function() {    
     
-    console.log("jquery ready!");
+  console.log("jquery ready!");
 	
 	canvasid = "maincanvas";
 	    
-    var game = new GameManager(canvasid);
+  var game = new GameManager(canvasid);
 	
 	game.start_run();
 		
@@ -254,17 +256,16 @@ $(function() {
 			$(this).html("Run");		
 	});
 
+
 	$("#addbtn").click(function() {
 
-		var ballnum = $('#ballnum').val();
+      var ballnum = $('#ballnum').val();
 
-		if (ballnum < 1) {
-			alert("Not enough!");
-			return 0;
-		}
-		
-		game.add_rand_obj(ballnum);
-
+      if (ballnum < 1) {
+        alert("Not enough!");
+        return 0;
+      }		
+  		game.add_rand_obj(ballnum);
 	});
 	
 	$("#removebtn").click(function() { 
@@ -275,9 +276,7 @@ $(function() {
 			alert("Not enough!");
 			return 0;
 		}
-	
-		game.remove_rand_obj(ballnum);
-	
+		game.remove_rand_obj(ballnum);	
 	});
 	
 	$("#gravitycontrol").change(function() {
@@ -285,7 +284,7 @@ $(function() {
 		dbg(val);
         game.at.set_gravity(val);
 		$("#gravdisp").html(val);
-    });
+   });
 
 	function main(DT) {
 		window.requestAnimationFrame(main);
